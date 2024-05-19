@@ -6,8 +6,9 @@ LastEditTime: 2024-05-17 00:14:08
 FilePath: /Mayfif/function_node/example.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 '''
-from graph.base import NodeBase
+from graph.agents.base import NodeBase
 # 定义LengthNode类，继承自NodeBase
+
 class LengthNode(NodeBase):
     def process(self, data):
         """处理逻辑：返回字符串长度"""

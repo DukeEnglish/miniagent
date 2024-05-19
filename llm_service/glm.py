@@ -50,9 +50,6 @@ class GLMService():
             
             yield content
 
-from llm_service.glm import GLMService
-
-# yi = YIService()
 glm_client = GLMService(GLM_API_KEY)
 
 if __name__ == '__main__':

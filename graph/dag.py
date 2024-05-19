@@ -1,137 +1,137 @@
-from abc import ABC, abstractmethod
 import logging
-import networkx as nx
-import matplotlib.pyplot as plt
-from graph.example import FirstCharNode, ConcatNode, LengthNode
-import json
-from pathlib import Path
-import importlib.util
-from typing import List, Any, Callable
-# 配置日志
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-module_name = "graph"
-module = importlib.import_module(module_name)
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from collections import defaultdict
+from graph.agents import *
+from graph_init import *
 
 
-def dynamic_import_and_create_instance(class_name):
-    try:
-        # 通过模块获取指定的类
-        cls = getattr(module, class_name)
-        return cls
-    except ImportError as e:
-        print(f"Error importing module '{module_name}': {e}")
-        return None
-    except AttributeError as e:
-        print(f"Class '{class_name}' not found in module '{module_name}': {e}")
-        return None
-
-
+# 定义DAG类，用于解析JSON配置和执行节点
 class DAG:
     def __init__(self, config):
         self.config = config
-        self.nodes = {}
-        self.edges = {}
+        self.agents = {}
+        self.dependencies = {}
+        self.env_variable = {}
+        self.output_agents_list = []
+        self.nodes_depend_on_mapskey = defaultdict(list)
+        self.load_agents()
 
-        # 创建节点实例并初始化nodes和edges字典
-        for node_config in config['nodes']:
-            node_name = node_config['name']
-            self.nodes[node_name] = dynamic_import_and_create_instance(
-                node_config["impl"])(node_config['name'])
-            if 'deps' in node_config:
-                self.edges[node_name] = node_config['deps']
-    #     return initial_data
-
-    def run(self, initial_data):
-        # ""“按拓扑排序的顺序运行DAG中的节点”""
-        execution_order = self.topological_sort()
-        current_data = initial_data
-        results = {}
-
-        for node_name in execution_order:
-            node = self.nodes[node_name]
-            node.data_structure[node.node_name]
-
-            result = node.run(current_data)
-            results[node_name] = result
-            current_data = result
-
-        return results
-
-    def add_node(self, node):
-        self.nodes[node.node_name] = node
-        self.execution_order.append(node)
-
-    def add_edge(self, from_node_name, to_node_name):
-        # 这里需要实现依赖关系的具体逻辑
-        pass
+    def load_agents(self):
+        """加载节点配置，实例化节点对象"""
+        for agent_config in self.config['agents']:
+            name = agent_config['name']
+            impl = globals()[agent_config['impl']]
+            agent = impl(name)
+            self.agents[name] = agent
+            self.dependencies[name] = agent_config.get('deps', [])
+            for dep in self.dependencies[name]:
+                self.nodes_depend_on_mapskey[dep].append(name)
+            if agent_config['impl'] == "OutputAgent":
+                self.output_agents_list = agent_config["output_agents_list"]
 
     def topological_sort(self):
-        visited = set()
-        sort_order = []
+        """拓扑排序，确保节点按依赖顺序执行"""
+        indegree = {agent: 0 for agent in self.agents}
+        for deps in self.dependencies.values():
+            for dep in deps:
+                indegree[dep] += 1
 
-        def dfs(node):
-            if node in visited:
-                return
-            visited.add(node)
-            for dep in self.edges.get(node, []):
-                dfs(dep)
-            sort_order.append(node)
+        queue = [agent for agent in self.agents if indegree[agent] == 0]
+        sorted_agents = []
 
-        for node in self.nodes:
-            if node not in visited:
-                dfs(node)
-        return sort_order
+        while queue:
+            agent = queue.pop(0)
+            sorted_agents.append(agent)
+            for dep in self.dependencies[agent]:
+                indegree[dep] -= 1
+                if indegree[dep] == 0:
+                    queue.append(dep)
 
-    def visualize(self):
-        G = nx.DiGraph()
-        for node in self.nodes.values():
-            G.add_node(node.name)
-        for source, targets in self.edges.items():
-            for target in targets:
-                G.add_edge(source, target)
-        nx.draw(G, with_labels=True, arrows=True)
-        plt.show()
+        if len(sorted_agents) != len(self.agents):
+            raise ValueError("Graph has cycles")
 
+        return sorted_agents
+    
+    def execute_agent(self, agent_name, initial_input):
+        
+        agent = self.agents[agent_name]
+        deps_data = [self.env_variable[dep] for dep in self.dependencies[agent_name]]
+        return agent.run(deps_data if deps_data else initial_input)
 
-if __name__ == '__main__':
-    import json
-    # JSON配置
-    dag_config = """
-    {
-    "nodes": [
-        {
-        "name": "node0",
-        "impl": "InputNode"
-        "type": "io"
-        },
-        {
-        "name": "node1",
-        "impl": "LengthNode",
-        "deps": ["node0"]
-        },
-        {
-        "name": "node2",
-        "impl": "FirstCharNode",
-        "deps": ["node0"]
-        },
-        {
-        "name": "node3",
-        "impl": "ConcatNode",
-        "deps": ["node1", "node2"]
-        }
-    ]
-    }
-    """
+    def run(self, initial_input):
+        """运行DAG，执行所有节点"""
+        sorted_agents = self.topological_sort()[::-1]
+        # 从sorted_agents中移除OutputAgent并保存到单独的变量中
+        output_agent_name = 'output_agent'
+        sorted_agents.remove(output_agent_name)
+        output_agent = self.agents[output_agent_name]
 
-    # 解析JSON配置
-    dag_json = json.loads(dag_config)
+        if self.config.get('parallel', False):
+            # 如果配置为并行执行
+            res = self.parallel_run(sorted_agents, initial_input)
+        else:
+            # 如果配置为串行执行
+            res = self.serial_run(sorted_agents, initial_input)
+        return output_agent.process(res, self.output_agents_list)
 
-    # 创建DAG实例并运行
-    dag = DAG(dag_json)
-    dag.visualize()
-    try:
-        result = dag.run("sdfsd")
-        logger.info(f"Final Result: {result['node3']}")
-    except ValueError as e:
-        logger.error(e)
+    def serial_run(self, sorted_agents, initial_input):
+        """串行执行所有节点"""
+        for agent_name in sorted_agents:
+            self.env_variable[agent_name] = self.execute_agent(agent_name, initial_input)
+        return self.env_variable
+
+    def parallel_run(self, initial_input):
+        self.env_variable = {}
+        execution_order = self.topological_sort()
+        futures = {}
+        with ThreadPoolExecutor() as executor:
+            for agent_name in execution_order:
+                if self.agents[agent_name].impl_type == 'io':
+                    future = executor.submit(self.execute_agent, agent_name)
+                else:
+                    future = executor.submit(self.execute_agent, agent_name)
+                futures[agent_name] = future
+        for agent_name, future in as_completed(futures.values()):
+            self.env_variable[agent_name] = future.result()
+        return self.env_variable
+    
+    def parallel_run(self, sorted_nodes, initial_input):
+        """并行执行所有节点"""
+        with ThreadPoolExecutor() as executor:
+            futures = {}
+            lock = Lock()
+            remaining_dependencies = {node: set(deps) for node, deps in self.dependencies.items()}
+
+            def submit_node(node_name):
+                future = executor.submit(self.execute_node, node_name, initial_input)
+                futures[future] = node_name
+
+            # 提交没有依赖的节点
+            for node_name in sorted_nodes:
+                if not self.dependencies[node_name]:
+                    submit_node(node_name)
+
+            while futures:
+                for future in as_completed(futures):
+                    node_name = futures.pop(future)
+                    try:
+                        self.data_structure[node_name] = future.result()
+                    except Exception as e:
+                        self.nodes[node_name].log(f"An error occurred: {e}", level=logging.ERROR)
+                        raise
+
+                    # 提交依赖已经完成的节点
+                    with lock:
+                        for dependent in self.nodes_depend_on_mapskey[node_name]:
+                            remaining_dependencies[dependent].remove(node_name)
+                            if not remaining_dependencies[dependent]:
+                                submit_node(dependent)
+
+        return self.env_variable
+    
+    def print_topological_sort(self):
+        sorted_agents = self.topological_sort()
+        print("Topological Sort Order:")
+        for agent in sorted_agents:
+            print(agent)

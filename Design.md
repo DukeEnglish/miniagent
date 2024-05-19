@@ -61,6 +61,16 @@ Non-LLM-Agent：在这里定义的Agent，属于plugin，即可预期的能力�
 ## Agent商店
 作者设计了一些Agent，见；
 
+## 项目布局
+本项目是一个框架，其支持基础的底层api交互，同时也提供了一个简单的前端供娱乐玩耍
+1. graph：定义基础的图结构，包括节点、边、属性等
+2. config：大模型的基础配置
+3. main：函数主要入口
+4. llm_service：llm服务的调用
+5. debug_folder：debug用的
+6. dag：图的配置
+7. app：前端以及一些资源设置
+
 
 ## todo
 1. 图的可视化->引入图像自动化生成，完成Agents的自动化构建
