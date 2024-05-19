@@ -35,11 +35,34 @@ def dag_run(dag, initial_input):
 
 
 def main():
-    config_path = "dag_conf/story_create.conf"
+    config_path = "dag_conf/marketing_text_file.conf"
     dag = get_dag(load_graph(config_path))
-    initial_input = "帮我写一个100字的小说"
+    initial_input = "给我写十条小红书用的文案"
     dag_run(dag, initial_input)
 
+def main_file():
+    config_path = "dag_conf/story_create_file.conf"
+    dag = get_dag(load_graph(config_path))
+    file_input_path = "/Users/duke/Work/freelife/miniagent/output.txt"
+    dag_run(dag, file_input_path)
 
+def main_code():
+    """很有用，帮忙读代码
+    """
+    config_path = "dag_conf/code_reading.conf"
+    dag = get_dag(load_graph(config_path))
+    file_input_path = "/Users/duke/Work/freelife/miniagent/llm_service"
+    dag_run(dag, file_input_path)
+
+def main_coder():
+    """很有用，帮忙读代码
+    """
+    config_path = "dag_conf/coder.conf"
+    dag = get_dag(load_graph(config_path))
+    dag_run(dag, "帮我写个快速排序")
+    
 if __name__ == "__main__":
-    main()
+    # main()
+    # main_file()
+    # main_code()
+    # main_coder()

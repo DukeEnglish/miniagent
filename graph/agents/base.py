@@ -8,6 +8,7 @@ Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查�
 '''
 from abc import ABC, abstractmethod
 import logging
+import os
 
 
 # 配置日志
@@ -92,7 +93,7 @@ class OutputAgent(AgentBase):
     def __init__(self, agent_name):
         super().__init__(agent_name)
 
-    def process(self, env, agents):
+    def process(self, env, agents, _, __):
         # 如果需要返回所有代理的输出结果
         if not agents:
             return env
@@ -101,3 +102,27 @@ class OutputAgent(AgentBase):
             # 假设 agents 是一个包含代理名称的列表
 
             return {agent_name: env.get(agent_name) for agent_name in agents if agent_name in agents}
+
+class FileOutputAgent(AgentBase):
+    def __init__(self, agent_name):
+        super().__init__(agent_name)
+
+    def process(self, env, agents, dep_name, file_path):
+        # 写入默认仅支持写入最后的节点输出
+        if not agents:
+            output = env
+        # 如果只需要返回特定代理的输出结果
+        else:
+            # 假设 agents 是一个包含代理名称的列表
+
+            output = {agent_name: env.get(agent_name) for agent_name in agents if agent_name in agents}
+        
+        with open(file_path, 'a') as file:
+            file.write(str(output[dep_name[0]]))
+        
+        # 日志记录写入操作
+        self.log(f"Data written to {file_path}")
+        print(f"Data written to {file_path}")
+
+        # 返回写入的数据，如果需要的话
+        return output

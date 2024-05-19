@@ -1,0 +1,115 @@
+以下是您提供的代码的详细解释，以Markdown格式呈现：
+
+```markdown
+# 代码分析
+
+这段代码主要包含以下几个部分：
+
+1. **代码信息**：包含了描述、作者、邮箱、日期等元信息。
+2. **GLMService类**：用于调用智谱AI的服务。
+3. **LLMBaseService类和BAIDULLMService类**：提供基础LLM模型服务和百度LLM服务。
+
+## 1. 代码信息
+
+这部分提供了代码的作者、最后编辑时间和一些描述信息。
+
+```python
+'''
+Descripttion: 
+Author: Duke 叶兀
+E-mail: ljyduke@gmail.com
+Date: 2024-01-06 12:55:46
+LastEditors: Duke 叶兀
+LastEditTime: 2024-01-18 02:13:18
+'''
+```
+
+## 2. GLMService类
+
+这个类封装了调用智谱AI服务的接口。
+
+```python
+import logging
+from zhipuai import ZhipuAI
+from config import GLM_API_KEY
+
+class GLMService():
+    def __init__(self, api_key):
+        self.client = ZhipuAI(api_key=api_key)  # 初始化智谱AI客户端
+
+    def llm(self, user_input="推荐中国自驾游路线"):
+        # 发送非流式请求到智谱AI，并获取响应
+        response = self.client.chat.completions.create(
+            model="glm-4",  # 模型名称
+            messages=[
+                {"role": "user", "content": user_input},
+            ],
+            stream=False,
+        )
+        # 处理响应并返回
+        res = response.choices[0].message.content
+        logging.info(f"yi_single_service's resp is {res}")
+        return res
+
+    def llm_stream(self, user_input='推荐中国自驾游路线'):
+        # 发送流式请求到智谱AI，并逐块获取响应内容
+        response = self.client.chat.completions.create(
+            model="glm-4",  # 模型名称
+            messages=[
+                {"role": "user", "content": user_input},
+            ],
+            stream=True,
+        )
+        # 遍历流式响应并返回内容
+        for chunk in response:
+            content = chunk.choices[0].delta.content
+            if not content:
+                continue
+            yield content
+
+glm_client = GLMService(GLM_API_KEY)
+
+# 当直接运行时，执行以下代码
+if __name__ == '__main__':
+    glm = GLMService(GLM_API_KEY)
+    res = glm.llm(user_input='你好，你是谁')
+    print(res)
+    res = glm.llm_stream(user_input='你好')
+    for i in res:
+        print(i)
+        print()
+```
+
+## 3. LLMBaseService类和BAIDULLMService类
+
+这些类定义了基础LLM模型服务和百度特定的LLM服务。
+
+```python
+class LLMBaseService():
+    # LLM模型基础服务，包含了一些待实现的特性
+    def __init__(self):
+        pass
+
+class BAIDULLMService(LLMBaseService):
+    def __init__(self):
+        # 初始化百度LLM服务的参数
+        # ...
+        pass
+
+    def _get_access_token(self, USER_BAIDU_API_KEY='', USER_BAIDU_SECRET_KEY=''):
+        # 使用API Key和Secret Key获取access_token
+        # ...
+        url = "..."
+        # 发起请求并获取响应
+        response = requests.request("POST", url, headers=headers, data=payload)
+        return response.json().get("access_token", "")
+```
+
+## 注意事项
+
+- 代码中使用了`config.py`来获取API密钥，但`config.py`文件并未提供，实际使用时需要根据实际情况配置。
+- `_get_access_token`方法用于获取百度API的访问令牌，这是调用百度服务的前提。
+- `llm`和`llm_stream`方法分别用于发送同步和异步请求到智谱AI服务。
+```
+
+以上就是对您提供的代码的详细解释，希望对您有所帮助。

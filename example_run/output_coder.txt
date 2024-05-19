@@ -1,0 +1,22 @@
+快速排序是一种高效的排序算法，采用分治策略，通过递归将数据分为较小的数据子集进行排序。下面是一个用Python实现的快速排序算法的例子：
+
+```python
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    else:
+        pivot = arr[0]  # 选择列表中的第一个元素作为基准点
+        less = [x for x in arr[1:] if x <= pivot]  # 所有小于等于基准点的元素构成的子数组
+        greater = [x for x in arr[1:] if x > pivot]  # 所有大于基准点的元素构成的子数组
+        return quick_sort(less) + [pivot] + quick_sort(greater)  # 递归排序并合并结果
+
+# 测试代码
+if __name__ == "__main__":
+    array_to_sort = [29, 13, 22, 37, 52, 49, 46, 71, 56]
+    sorted_array = quick_sort(array_to_sort)
+    print("Sorted array:", sorted_array)
+```
+
+在这个例子中，`quick_sort` 函数实现了快速排序算法的核心逻辑。它递归地将数组分为小于和大于基准点的两个子数组，然后对这些子数组进行排序并合并结果。
+
+请注意，为了保持代码的简洁性和易于理解，这个版本不是原地排序，因为它创建了新的数组。对于生产环境，快速排序通常应该以原地的方式进行，以减少内存使用。

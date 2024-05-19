@@ -29,8 +29,23 @@ class ENZHTranslatorAgent(LLMAgent):
 class StoryAgent(LLMAgent):
     def prompt(self, data):
         tpl = """
-            请根据我输入的内容，完成任务。
+            请根据我输入的内容，将小说继续写下去
             输入内容：{data}
                 """
         return tpl.format(data=data)
 
+class CodeReaderAgent(LLMAgent):
+    def prompt(self, data):
+        tpl = """
+            请根据我输入的内容，将代码分析清楚，最终用markdown的格式帮我把代码讲解清楚
+            输入内容：{data}
+                """
+        return tpl.format(data=data)
+
+class CoderAgent(LLMAgent):
+    def prompt(self, data):
+        tpl = """
+            根据我输入的内容，帮我完成要完成的代码任务
+            输入内容：{data}
+                """
+        return tpl.format(data=data)

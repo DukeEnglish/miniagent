@@ -29,6 +29,9 @@ class DAG:
                 self.nodes_depend_on_mapskey[dep].append(name)
             if agent_config['impl'] == "OutputAgent":
                 self.output_agents_list = agent_config["output_agents_list"]
+            if agent_config['impl'] == "FileOutputAgent":
+                self.output_agents_list = agent_config["output_agents_list"]
+                self.file_path = agent_config["file_path"]
 
     def topological_sort(self):
         """拓扑排序，确保节点按依赖顺序执行"""
@@ -74,7 +77,7 @@ class DAG:
         else:
             # 如果配置为串行执行
             res = self.serial_run(sorted_agents, initial_input)
-        return output_agent.process(res, self.output_agents_list)
+        return output_agent.process(res, self.output_agents_list, self.dependencies[output_agent_name], self.file_path)
 
     def serial_run(self, sorted_agents, initial_input):
         """串行执行所有节点"""
