@@ -12,10 +12,13 @@ from graph_init import *
 from graph.dag import DAG
 import json
 # 这里就是读取图配置，并且建立图，然后运行
+
+
 def load_graph(config_path):
     with open(config_path, 'r') as config_file:
         config = json.load(config_file)
     return config
+
 
 def dag_run(dag_config):
     # 创建DAG实例并运行
@@ -26,9 +29,11 @@ def dag_run(dag_config):
     except ValueError as e:
         logger.error(e)
 
+
 def main():
     config_path = "dag_conf/example.conf"
     dag_run(load_graph(config_path))
+
 
 if __name__ == "__main__":
     main()

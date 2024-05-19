@@ -15,6 +15,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # 定义抽象基类AgentBase
+
+
 class AgentBase(ABC):
     def __init__(self, agent_name):
         self.agent_name = agent_name
@@ -47,10 +49,12 @@ class AgentBase(ABC):
             self.log(f"An error occurred: {e}", level=logging.ERROR)
             raise
 
+
 class FolderInputAgent(AgentBase):
     def __init__(self, agent_name):
         super().__init__(agent_name)
         self.impl_type = 'io'
+
     def process(self, folder_path):
         # 初始化一个空字符串用于存储所有文件内容
         file_contents = ""
@@ -60,23 +64,29 @@ class FolderInputAgent(AgentBase):
                 with open(os.path.join(folder_path, filename), 'r', encoding='utf-8') as file:
                     file_contents += file.read() + "\n"  # 读取文件内容并添加换行符
         return file_contents
-    
+
+
 class FileInputAgent(AgentBase):
     def __init__(self, agent_name):
         super().__init__(agent_name)
         self.impl_type = 'io'
+
     def process(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
 
 # 输入节点，从用户获取输入数据
+
+
 class InputAgent(AgentBase):
     def __init__(self, agent_name):
         super().__init__(agent_name)
         self.impl_type = 'io'
+
     def process(self, data):
         # 假设data是用户的输入
         return data
+
 
 class OutputAgent(AgentBase):
     def __init__(self, agent_name):
@@ -89,5 +99,5 @@ class OutputAgent(AgentBase):
         # 如果只需要返回特定代理的输出结果
         else:
             # 假设 agents 是一个包含代理名称的列表
-            
+
             return {agent_name: env.get(agent_name) for agent_name in agents if agent_name in agents}

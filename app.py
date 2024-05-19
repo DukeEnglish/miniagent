@@ -31,12 +31,14 @@ HTML_FORM = '''
 </html>
 '''
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     echo_text = None
     if request.method == 'POST':
         echo_text = request.form['echo_text']
     return render_template_string(HTML_FORM, echo_text=echo_text)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

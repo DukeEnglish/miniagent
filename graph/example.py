@@ -9,6 +9,7 @@ Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查�
 from graph.agents.base import NodeBase
 # 定义LengthNode类，继承自NodeBase
 
+
 class LengthNode(NodeBase):
     def process(self, data):
         """处理逻辑：返回字符串长度"""
@@ -17,6 +18,8 @@ class LengthNode(NodeBase):
         return len(data)
 
 # 定义FirstCharNode类
+
+
 class FirstCharNode(NodeBase):
     def process(self, data):
         """处理逻辑：返回字符串的第一个字符"""
@@ -25,6 +28,8 @@ class FirstCharNode(NodeBase):
         return data[0]
 
 # 定义ConcatNode类
+
+
 class ConcatNode(NodeBase):
     def process(self, data):
         """处理逻辑：组合长度和第一个字符信息"""

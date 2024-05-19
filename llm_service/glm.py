@@ -6,21 +6,14 @@ Date: 2024-01-06 12:55:46
 LastEditors: Duke 叶兀
 LastEditTime: 2024-01-18 02:13:18
 '''
-
-import requests
-import json
 import logging
-# from llm_service.base_service import BAIDULLMService
-import time
-# import jwt
 from zhipuai import ZhipuAI
 from config import GLM_API_KEY
 
 
 class GLMService():
     def __init__(self, api_key):
-        self.client = ZhipuAI(api_key=api_key) # 请填写您自己的APIKey
-
+        self.client = ZhipuAI(api_key=api_key)  # 请填写您自己的APIKey
 
     def llm(self, user_input="推荐中国自驾游路线"):
 
@@ -30,7 +23,7 @@ class GLMService():
                 {"role": "user", "content": user_input},
             ],
             stream=False,
-            )
+        )
         res = response.choices[0].message.content
         logging.info(f"yi_single_service' resp is {res}")
         return res
@@ -42,13 +35,14 @@ class GLMService():
                 {"role": "user", "content": user_input},
             ],
             stream=True,
-            )
+        )
         for chunk in response:
             content = chunk.choices[0].delta.content
             if not content:
                 continue
-            
+
             yield content
+
 
 glm_client = GLMService(GLM_API_KEY)
 

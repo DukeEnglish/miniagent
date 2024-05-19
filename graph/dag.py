@@ -52,11 +52,12 @@ class DAG:
             raise ValueError("Graph has cycles")
 
         return sorted_agents
-    
+
     def execute_agent(self, agent_name, initial_input):
-        
+
         agent = self.agents[agent_name]
-        deps_data = [self.env_variable[dep] for dep in self.dependencies[agent_name]]
+        deps_data = [self.env_variable[dep]
+                     for dep in self.dependencies[agent_name]]
         return agent.run(deps_data if deps_data else initial_input)
 
     def run(self, initial_input):
@@ -78,7 +79,8 @@ class DAG:
     def serial_run(self, sorted_agents, initial_input):
         """串行执行所有节点"""
         for agent_name in sorted_agents:
-            self.env_variable[agent_name] = self.execute_agent(agent_name, initial_input)
+            self.env_variable[agent_name] = self.execute_agent(
+                agent_name, initial_input)
         return self.env_variable
 
     def parallel_run(self, initial_input):
@@ -95,16 +97,18 @@ class DAG:
         for agent_name, future in as_completed(futures.values()):
             self.env_variable[agent_name] = future.result()
         return self.env_variable
-    
+
     def parallel_run(self, sorted_nodes, initial_input):
         """并行执行所有节点"""
         with ThreadPoolExecutor() as executor:
             futures = {}
             lock = Lock()
-            remaining_dependencies = {node: set(deps) for node, deps in self.dependencies.items()}
+            remaining_dependencies = {
+                node: set(deps) for node, deps in self.dependencies.items()}
 
             def submit_node(node_name):
-                future = executor.submit(self.execute_node, node_name, initial_input)
+                future = executor.submit(
+                    self.execute_node, node_name, initial_input)
                 futures[future] = node_name
 
             # 提交没有依赖的节点
@@ -118,7 +122,8 @@ class DAG:
                     try:
                         self.data_structure[node_name] = future.result()
                     except Exception as e:
-                        self.nodes[node_name].log(f"An error occurred: {e}", level=logging.ERROR)
+                        self.nodes[node_name].log(
+                            f"An error occurred: {e}", level=logging.ERROR)
                         raise
 
                     # 提交依赖已经完成的节点
@@ -129,7 +134,7 @@ class DAG:
                                 submit_node(dependent)
 
         return self.env_variable
-    
+
     def print_topological_sort(self):
         sorted_agents = self.topological_sort()
         print("Topological Sort Order:")
