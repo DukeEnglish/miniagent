@@ -21,6 +21,8 @@ class ENZHTranslatorAgent(LLMAgent):
     def prompt(self, data):
         tpl = """
             请根据我输入的内容，如果是中文请翻译为英文，如果是英文请翻译为中文。
+            1. 格式保持原样
+            2. 仅输出翻译后的结果，不要擅自增加东西
             输入内容：{data}
                 """
         return tpl.format(data=data)

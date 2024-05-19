@@ -60,9 +60,17 @@ def main_coder():
     config_path = "dag_conf/coder.conf"
     dag = get_dag(load_graph(config_path))
     dag_run(dag, "帮我写个快速排序")
+
+def main_readme():
+    """很有用，帮忙读代码
+    """
+    config_path = "dag_conf/readme_syn.conf"
+    dag = get_dag(load_graph(config_path))
+    dag_run(dag, "README_ZH.md")
     
 if __name__ == "__main__":
     # main()
     # main_file()
     # main_code()
     # main_coder()
+    main_readme()
