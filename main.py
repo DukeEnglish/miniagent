@@ -20,19 +20,25 @@ def load_graph(config_path):
     return config
 
 
-def dag_run(dag_config):
+def get_dag(dag_config):
+    return DAG(dag_config)
+
+
+def dag_run(dag, initial_input):
     # 创建DAG实例并运行
-    dag = DAG(dag_config)
+
     try:
-        result = dag.run("你好啊")
+        result = dag.run(initial_input)
         logger.info(f"Final Result: {result}")
     except ValueError as e:
         logger.error(e)
 
 
 def main():
-    config_path = "dag_conf/example.conf"
-    dag_run(load_graph(config_path))
+    config_path = "dag_conf/story_create.conf"
+    dag = get_dag(load_graph(config_path))
+    initial_input = "帮我写一个100字的小说"
+    dag_run(dag, initial_input)
 
 
 if __name__ == "__main__":
