@@ -18,7 +18,8 @@ class GLMService():
     def llm(self, user_input="推荐中国自驾游路线"):
 
         response = self.client.chat.completions.create(
-            model="glm-4",  # 填写需要调用的模型名称
+            # model="glm-4",  # 填写需要调用的模型名称
+            model="GLM-3-Turbo",
             messages=[
                 {"role": "user", "content": user_input},
             ],
