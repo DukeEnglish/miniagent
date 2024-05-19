@@ -1,3 +1,4 @@
+```markdown
 <!--
  * @Description: 
  * @Author: Duke 叶兀
@@ -6,11 +7,9 @@
  * @LastEditors: Junyi_Li ljyduke@gmail.com
  * @LastEditTime: 2024-05-19 20:05:55
 -->
-# Dialogue Framework Miniagent
+# Dialogue Framework miniagent
 
 Project Link: https://github.com/DukeEnglish/miniagent
-
-Chinese README: https://github.com/DukeEnglish/miniagent/blob/main/README_ZH.md
 
 # Project Introduction
 
@@ -27,11 +26,14 @@ Therefore, here we will develop from a very ordinary perspective, referring to t
 5. The project supports simple front-end and API access, making it easy to display and integrate with various modules
 6. [todo] Provides a log management and processing module, which makes it convenient for users to retain data based on their usage habits, for subsequent model/prompt optimization
 7. [todo] Multiple parameter input, in the form of a dictionary input, so that different node input parameters can be specified. This is mainly for some flexible inputs of basenode, and others can be directly configured in the graph
+8. [todo] Add some global configurations to adapt to the use of more different models
 
 ## Sample Tasks
 All preset graphs are in dag_conf.
 
-story_create.conf: Let the large model continue to write novels without manually interacting one by one, and configure it in the main function path to see the results.
+- story_create.conf: Let the large model continue to write novels without manually interacting one by one, and configure it in the main function path to see the results.
+- code_reading.conf: Let the large model help read code, can directly read files/folders, very cool, a time-saving tool
+- coder.conf: Let the large model help write code
 
 ## Support
 
@@ -45,3 +47,4 @@ If you like this project, please give it a star 🌟 to show your support! Thank
 
 ## Detailed Introduction
 For other information, see: https://www.zhihu.com/people/ljyduke
+```
