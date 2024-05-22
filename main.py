@@ -51,7 +51,7 @@ def main_code():
     """
     config_path = "dag_conf/code_reading.conf"
     dag = get_dag(load_graph(config_path))
-    file_input_path = "/Users/duke/Work/freelife/miniagent/llm_service"
+    file_input_path = "/Users/duke/Work/freelife/miniagent/"
     dag_run(dag, file_input_path)
 
 def main_coder():
@@ -66,11 +66,11 @@ def main_readme():
     """
     config_path = "dag_conf/readme_syn.conf"
     dag = get_dag(load_graph(config_path))
-    dag_run(dag, "README_ZH.md")
+    dag_run(dag, "README.md")
     
 if __name__ == "__main__":
     # main()
     # main_file()
-    # main_code()
+    main_code()
     # main_coder()
-    main_readme()
+    # main_readme()

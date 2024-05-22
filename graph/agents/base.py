@@ -59,11 +59,21 @@ class FolderInputAgent(AgentBase):
     def process(self, folder_path):
         # 初始化一个空字符串用于存储所有文件内容
         file_contents = ""
+        extensions = {
+        '.txt', '.md', '.csv', '.json', '.xml', '.html', '.rtf', '.log', 
+        '.py', '.java', '.js', '.css', '.scss', '.php', '.c', '.cpp', '.h', 
+        '.sh', '.bat', '.ps1', '.rb', '.go', '.swift', '.asm'
+        # 根据需要添加或删除扩展名
+    }
         # 遍历文件夹中的所有文件
         for filename in os.listdir(folder_path):
-            if os.path.isfile(os.path.join(folder_path, filename)):
-                with open(os.path.join(folder_path, filename), 'r', encoding='utf-8') as file:
-                    file_contents += file.read() + "\n"  # 读取文件内容并添加换行符
+            # 获取文件的扩展名
+            _, ext = os.path.splitext(filename)
+            # 检查文件扩展名是否在集合中
+            if ext.lower() in extensions:
+                if os.path.isfile(os.path.join(folder_path, filename)):
+                    with open(os.path.join(folder_path, filename), 'r', encoding='utf-8') as file:
+                        file_contents += file.read() + "\n"  # 读取文件内容并添加换行符
         return file_contents
 
 
