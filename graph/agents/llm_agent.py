@@ -1,6 +1,7 @@
 from graph.agents.base import AgentBase
 from llm_service import glm_client
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
 
 class LLMAgent(AgentBase):
     def __init__(self, agent_name):
@@ -10,13 +11,13 @@ class LLMAgent(AgentBase):
     @abstractmethod
     def prompt(self, data):
         pass
-    
+
     def process(self, data):
         # data是用户的输入
         res = glm_client.llm(self.prompt(data))
         return res
 
-    
+
 class ENZHTranslatorAgent(LLMAgent):
     def prompt(self, data):
         tpl = """
@@ -31,13 +32,17 @@ class ENZHTranslatorAgent(LLMAgent):
 class StoryAgent(LLMAgent):
     def prompt(self, data):
         tpl = """
-            请根据我输入的内容，将小说继续写下去
+            请根据我输入的内容，将小说继续写下去。
             输入内容：{data}
                 """
         return tpl.format(data=data)
 
+
 class CodeReaderAgent(LLMAgent):
     def prompt(self, data):
+        with open("prompt/code_reader.md", "r", encoding="utf-8") as f:
+            tpl = f.read()
+
         tpl = """
             我理解您的需求了，这是按照您要求的格式制作的角色描述：
 
@@ -67,6 +72,7 @@ class CodeReaderAgent(LLMAgent):
             输入内容：{data}
                 """
         return tpl.format(data=data)
+
 
 class CoderAgent(LLMAgent):
     def prompt(self, data):
