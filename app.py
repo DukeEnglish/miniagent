@@ -1,44 +1,52 @@
-'''
-Author: Junyi_Li ljyduke@gmail.com
-Date: 2024-05-15 20:44:04
-LastEditors: Junyi_Li ljyduke@gmail.com
-LastEditTime: 2024-05-15 20:44:34
-FilePath: /Mayfif/app.py
-Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
-'''
-from flask import Flask, request, render_template_string
+# app.py
+from flask import Flask, render_template, request, Response
+from llm_service.glm import glm_client
+from flask_cors import CORS
+import json
+import time
 
 app = Flask(__name__)
+CORS(app)  # 允许所有域名访问
 
-# 简单的HTML表单
-HTML_FORM = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Echo Service</title>
-</head>
-<body>
-    <h2>Enter something to echo:</h2>
-    <form method="post">
-        <input type="text" name="echo_text" placeholder="Type something...">
-        <input type="submit" value="Submit">
-    </form>
-    {% if echo_text %}
-        <h3>You said: {{ echo_text }}</h3>
-    {% endif %}
-</body>
-</html>
-'''
+# 默认设置
+DEFAULT_LLM_SERVICE_URL = 'https://default-llm-service.com/api'
+DEFAULT_API_KEY = 'default-api-key'
 
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    echo_text = None
-    if request.method == 'POST':
-        echo_text = request.form['echo_text']
-    return render_template_string(HTML_FORM, echo_text=echo_text)
+    return render_template('index.html')
 
+@app.route('/chat', methods=['POST', 'GET'])
+def chat():
+    '''ChatGPT Prompt'''
+    if request.method == 'POST':
+        user_input = request.json.get('message', [])
+        llm_service_url = request.json.get('llmservice', DEFAULT_LLM_SERVICE_URL)
+        api_key = request.json.get('apikey', DEFAULT_API_KEY)
+
+        headers = {'Authorization': f'Bearer {api_key}'}
+        response = glm_client.llm_stream(user_input=user_input)
+
+        messages = []
+        for line in response:
+            messages.append({"userMessage": user_input, "botMessage": line})
+
+        return json.dumps(messages)
+
+    def generate():
+        user_input = request.args.get('message', [])
+        llm_service_url = request.args.get('llmservice', DEFAULT_LLM_SERVICE_URL)
+        api_key = request.args.get('apikey', DEFAULT_API_KEY)
+
+        headers = {'Authorization': f'Bearer {api_key}'}
+        response = glm_client.llm_stream(user_input=user_input)
+
+        for line in response:
+            time.sleep(0.5)
+            print(f'data: {json.dumps({"userMessage": user_input, "botMessage": line})}\n\n')
+            yield f'data: {json.dumps({"userMessage": user_input, "botMessage": line})}\n\n'
+
+    return Response(generate(), mimetype='text/event-stream')
 
 if __name__ == '__main__':
     app.run(debug=True)
