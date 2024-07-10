@@ -32,8 +32,13 @@ class ENZHTranslatorAgent(LLMAgent):
 class StoryAgent(LLMAgent):
     def prompt(self, data):
         tpl = """
-            请根据我输入的内容，将小说继续写下去。
+            请根据输入的内容，将小说继续写下去。
             输入内容：{data}
+            注意：
+            1. 格式要使用markdown格式，要有章节和小标题
+            2. 故事情节前后要完整
+            3. 要有一个情节，给主人公一个英雄救美的机会，这个要是一个白富美
+            4. 每个小节都需要有1千字以上，一节一节的写，不要贪多
                 """
         return tpl.format(data=data)
 
@@ -80,4 +85,12 @@ class CoderAgent(LLMAgent):
             根据我输入的内容，帮我完成要完成的代码任务
             输入内容：{data}
                 """
+        return tpl.format(data=data)
+
+class CodeAnalysisLLMAgent(LLMAgent):
+    def prompt(self, data):
+        tpl = """
+            以下是给定项目的一系列信息：{data}
+            请基于此给出一定的代码质量分析以及其他你觉得必要的分析
+            """
         return tpl.format(data=data)

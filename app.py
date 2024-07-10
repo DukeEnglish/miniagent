@@ -18,9 +18,11 @@ def index():
 
 @app.route('/chat', methods=['POST', 'GET'])
 def chat():
+    print(request.json)
     '''ChatGPT Prompt'''
     if request.method == 'POST':
         user_input = request.json.get('message', [])
+        print(user_input)
         llm_service_url = request.json.get('llmservice', DEFAULT_LLM_SERVICE_URL)
         api_key = request.json.get('apikey', DEFAULT_API_KEY)
 
@@ -49,4 +51,4 @@ def chat():
     return Response(generate(), mimetype='text/event-stream')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=1234)

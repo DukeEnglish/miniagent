@@ -67,10 +67,18 @@ def main_readme():
     config_path = "dag_conf/readme_syn.conf"
     dag = get_dag(load_graph(config_path))
     dag_run(dag, "README.md")
+
+
+def main_story():
+    """根据作者的构思，创作小故事
+    """
+    config_path = "dag_conf/story_create_file_0602.conf"
+    dag = get_dag(load_graph(config_path))
+    dag_run(dag, "0602stroy.md")
     
 if __name__ == "__main__":
     # main()
     # main_file()
-    main_code()
+    main_story()
     # main_coder()
     # main_readme()
